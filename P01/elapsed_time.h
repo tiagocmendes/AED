@@ -10,7 +10,7 @@
 //   dt = elapsed_time();
 //
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
 
 //
 // GNU/Linux code to measure elapsed time
