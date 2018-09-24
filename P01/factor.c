@@ -1,13 +1,13 @@
 //
 // Tomás Oliveira e Silva, AED, September 2014, September 2017
 //
-// program to factor integers larger than 1
+// buggy program to factor integers larger than 1
 //
 
 #include <stdio.h>
 #include <stdlib.h>
 
-int factor(int n,int *prime_factors,int *multiplicity)
+int factor(long n,int *prime_factors,int *multiplicity)
 {
   int d,n_factors;
 
@@ -18,7 +18,7 @@ int factor(int n,int *prime_factors,int *multiplicity)
   //   these last are harmless, but slow the program down
   //   getting rid of them would, however, require much more complicated code
   //   the expression (d+1)|1 has the effect of adding 1 to d if d is even and adding 2 if it is odd
-  //     note that the expression (x|1) is the bitwise or or the bits of with the bits of the constant 1,
+  //     note that the expression (x|1) is the bitwise or of the bits of x with the bits of the constant 1,
   //     so in this case it makes the least significant bit of the result always 1 (odd integer!)
   //
   //     d  d+1  (d+1)|1
@@ -30,7 +30,7 @@ int factor(int n,int *prime_factors,int *multiplicity)
   //
   // the following code has a bug (possible arithmetic overflow); correct it!
   //
-  for(d = 2;d <= 46340 && d * d <= n;d = (d + 1) | 1)
+  for(d = 2;d * d <= n;d = (d + 1) | 1)
     if(n % d == 0)
     {
       prime_factors[n_factors] = d; // d is a prime factor
@@ -43,7 +43,6 @@ int factor(int n,int *prime_factors,int *multiplicity)
       while(n % d == 0);
       n_factors++;
     }
-printf("d=%d\n",d);
   if(n > 1)
   { // the remaining divisor, if any, must be a prime number
     prime_factors[n_factors] = n;
@@ -54,13 +53,13 @@ printf("d=%d\n",d);
 
 int main(int argc,char **argv)
 {
-  int i,j,n,nf,f[16],m[16]; // the product of the first 16 primes is larger than 2^64
-
-  for(i = 1;i < argc;i++)
-    if((n = atoi(argv[i])) > 1)
+  int i,j,nf,f[16],m[16]; // the product of the first 16 primes is larger than 2^64
+  long n;                 // changed the type of n from (int) to (long)
+  for(i = 1;i < argc;i++){
+    if((n = atol(argv[i])) > 1)   // changed the function "atoi()" to "atol()"
     {
       nf = factor(n,f,m);
-      printf("%d = ",n);
+      printf("%li = ",n);
       for(j = 0;j < nf;j++)
         if(m[j] == 1)
           printf("%s%d",(j == 0) ? "" : "*",f[j]);
@@ -68,5 +67,7 @@ int main(int argc,char **argv)
           printf("%s%d^%d",(j == 0) ? "" : "*",f[j],m[j]);
       printf(" (%s)\n",(nf == 1 && m[0] == 1) ? "prime" : "composite");
     }
+  }
+    
   return 0;
 }

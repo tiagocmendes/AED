@@ -1,7 +1,7 @@
 //
-// Tomás Oliveira e Silva, AED, September 2017
+// Tomás Oliveira e Silva, AED, September 2018
 //
-// computation of Fibonacci numbers
+// computation of Fibonacci numbers (with a macro to avoid repeating similar lines)
 //
 
 #include <math.h>
@@ -69,22 +69,23 @@ int main(void)
   double dt1 = 0.0,dt2 = 0.0,dt3 = 0.0,dt4 = 0.0;
   s64 n,f;
 
-  FILE *fp;
-  fp = fopen ("fibonacci.csv","w");
-  fprintf(fp, "%10s;%10s;%10s;%10s;%10s\n","n","F_v1","F_v2","F_v3","F_v4");
-  
   printf("  n v                   Fn         time\n");
   printf("--- - -------------------- ------------\n");
-  for(n = (s64)0;n <= (s64)50;n++)
+  for(n = (s64)0;n <= (s64)100;n++)
   {
-    if(n < (s64)40 || dt1 < 10.0) { (void)elapsed_time(); f = F_v1(n); dt1 = elapsed_time(); printf("%3d 1 %20lld %12.9f\n",(int)n,f,dt1); }
-    if(n < (s64)40 || dt2 < 10.0) { (void)elapsed_time(); f = F_v2(n); dt2 = elapsed_time(); printf("%3d 2 %20lld %12.9f\n",(int)n,f,dt2); }
-    if(n < (s64)40 || dt3 < 10.0) { (void)elapsed_time(); f = F_v3(n); dt3 = elapsed_time(); printf("%3d 3 %20lld %12.9f\n",(int)n,f,dt3); }
-    if(n < (s64)40 || dt4 < 10.0) { (void)elapsed_time(); f = F_v4(n); dt4 = elapsed_time(); printf("%3d 4 %20lld %12.9f\n",(int)n,f,dt4); }
+#define measure(id)  if(n < (s64)40 || dt ## id < 10.0)                           \
+                     {                                                            \
+                       (void)elapsed_time();                                      \
+                       f = F_v ## id(n);                                          \
+                       dt ## id = elapsed_time();                                 \
+                       printf("%3d  " # id " %20lld %12.9f\n",(int)n,f,dt ## id); \
+                     }
+    measure(1);
+    measure(2);
+    measure(3);
+    measure(4);
+#undef measure
     printf("--- -- -------------------- ------------\n");
-
-    fprintf(fp, "%10d;%10f;%10f;%10f;%10f\n",(int)n, dt1, dt2, dt3, dt4);
   }
-  fclose(fp);
   return 0;
 }
