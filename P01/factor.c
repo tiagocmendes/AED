@@ -7,9 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int factor(long n,int *prime_factors,int *multiplicity)
+int factor(long n, int *prime_factors, int *multiplicity)
 {
-  int d,n_factors;
+  int d, n_factors;
 
   n_factors = 0;
   //
@@ -30,8 +30,8 @@ int factor(long n,int *prime_factors,int *multiplicity)
   //
   // the following code has a bug (possible arithmetic overflow); correct it!
   //
-  for(d = 2;d * d <= n;d = (d + 1) | 1)
-    if(n % d == 0)
+  for (d = 2; d * d <= n; d = (d + 1) | 1)
+    if (n % d == 0)
     {
       prime_factors[n_factors] = d; // d is a prime factor
       multiplicity[n_factors] = 0;
@@ -39,11 +39,10 @@ int factor(long n,int *prime_factors,int *multiplicity)
       {
         n /= d;
         multiplicity[n_factors]++;
-      }
-      while(n % d == 0);
+      } while (n % d == 0);
       n_factors++;
     }
-  if(n > 1)
+  if (n > 1)
   { // the remaining divisor, if any, must be a prime number
     prime_factors[n_factors] = n;
     multiplicity[n_factors++] = 1;
@@ -51,23 +50,36 @@ int factor(long n,int *prime_factors,int *multiplicity)
   return n_factors;
 }
 
-int main(int argc,char **argv)
+int main(int argc, char **argv)
 {
-  int i,j,nf,f[16],m[16]; // the product of the first 16 primes is larger than 2^64
-  long n;                 // changed the type of n from (int) to (long)
-  for(i = 1;i < argc;i++){
-    if((n = atol(argv[i])) > 1)   // changed the function "atoi()" to "atol()"
+  int i, j, k, nf, f[16], m[16]; // the product of the first 16 primes is larger than 2^64
+  long n;                        // changed the type of n from (int) to (long)
+  for (i = 1; i < argc; i++)
+  {
+    if ((n = atol(argv[i])) > 1) // changed the function "atoi()" to "atol()"
     {
-      nf = factor(n,f,m);
-      printf("%li = ",n);
-      for(j = 0;j < nf;j++)
-        if(m[j] == 1)
-          printf("%s%d",(j == 0) ? "" : "*",f[j]);
+      nf = factor(n, f, m);
+      printf("%li = ", n);
+      for (j = 0; j < nf; j++)
+      {
+        if (m[j] == 1)
+          printf("%s%d", (j == 0) ? "" : "*", f[j]);
         else
-          printf("%s%d^%d",(j == 0) ? "" : "*",f[j],m[j]);
-      printf(" (%s)\n",(nf == 1 && m[0] == 1) ? "prime" : "composite");
+          printf("%s%d^%d", (j == 0) ? "" : "*", f[j], m[j]);
+      }
+      printf(" (%s)\n", (nf == 1 && m[0] == 1) ? "prime" : "composite");
     }
+    // new code
+    printf("Divisores de %ld: ",n); // divisores de n
+    for(k = 1;k <= n;k++)
+    {
+      if((n % k) == 0)
+      {
+        printf("%d ", k);
+      }
+    }
+    printf("\n\n");
   }
-    
+
   return 0;
 }
