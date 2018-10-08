@@ -14,7 +14,7 @@
 #include <stdlib.h>
 
 #ifndef DEBUG
-#  define DEBUG 0  // use a positive value to see partial results
+#define DEBUG 0  // use a positive value to see partial results
 #endif
 
 typedef unsigned int uint;
