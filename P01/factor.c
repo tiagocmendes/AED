@@ -28,7 +28,7 @@ int factor(long n, int *prime_factors, int *multiplicity)
   //     4    5        5
   //     5    6        7
   //
-  // the following code has a bug (possible arithmetic overflow); correct it!
+  // the following code has a bug (possible arithmetic overflow);correct it!
   //
   for (d = 2; d * d <= n; d = (d + 1) | 1)
     if (n % d == 0)
