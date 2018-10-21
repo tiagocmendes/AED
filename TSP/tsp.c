@@ -1,7 +1,7 @@
 //
-// Student name
-// Student name
-// ...
+// Students
+// 88808 - João Miguel Nunes de Medeiros e Vasconcelos 
+// 88886 - Tiago Carvalho Mendes
 //
 // AED, 2018/2019
 //
@@ -16,7 +16,7 @@
 #include <sys/resource.h>
 
 #include "cities.h"
-#include "../P01/elapsed_time.h"
+#include "elapsed_time.h"
 
 
 //
@@ -66,7 +66,7 @@ int main(int argc,char **argv)
   char file_name[32];
   double dt1;
 
-  n_mec = 0; // CHANGE THIS!
+  n_mec = 88886; // change later to n_mec = 88808 
   special = 0;
   init_cities_data(n_mec,special);
   printf("data for init_cities_data(%d,%d)\n",n_mec,special);

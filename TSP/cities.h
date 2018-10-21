@@ -27,7 +27,7 @@ static int find_city(char *name)
   int i;
 
   for(i = 0;i < n_cities;i++)
-    if(strcmp(name,cities[i].name) == 0)
+    if(strcmp(name,cities[i].name) == 0)  // name == cities[i].name
       return i;
   return -1;
 }
@@ -73,7 +73,8 @@ static void new_distance(char *name1,char *name2,int distance,int special)
   if(special == 0)
     cities[i].distance[j] = cities[j].distance[i] = distance;
   else
-  {
+  { 
+    // if special == 1, the inter-city distances are asymmetric
     int c = strcoll(cities[i].name,cities[j].name);
     if(c < 0)
     {
