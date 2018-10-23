@@ -10,7 +10,7 @@
 #include <string.h>
 #include <locale.h>
 
-#define max_n_cities  18
+#define max_n_cities  18  // change to 18 later
 
 static struct
 {
@@ -63,7 +63,7 @@ static void new_distance(char *name1,char *name2,int distance,int special)
 {
   int i,j;
 
-  i = find_city(name1);
+  i = find_city(name1); 
   j = find_city(name2);
   if(i < 0 || j < 0 || i == j || distance <= 0 || distance >= 1000000)
   {
@@ -106,7 +106,7 @@ static void init_cities_data(int n_mec,int special)
   //
   // the city coordinates for the pt_master.svg custom map
   //
-  for(n = i = m = 0;n < 18;i = (int)random() % 18)
+  for(n = i = m = 0;n < 18;i = (int)random() % 18)  // change to 14?
     if((m & (1 << i)) == 0)
     {
       m |= 1 << i;

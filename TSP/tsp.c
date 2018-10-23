@@ -33,7 +33,8 @@ static long n_tours;
 
 void tsp_v1(int n,int m,int *a)
 {
-  int i,t;
+  int i,j,t;
+  int tourLength = 0;
 
   if(m < n - 1)
     for(i = m;i < n;i++)
@@ -49,9 +50,26 @@ void tsp_v1(int n,int m,int *a)
   else
   { // visit permutation
     n_tours++;
-    // modify the following code to do your stuff
-    for(i = 0;i < n;i++)
-      printf("%d%s",a[i],(i == n - 1) ? "\n" : " ");
+    for(j = 0;j < n-1;j++)
+    { // compute tourLength
+      tourLength += cities[a[j]].distance[a[j+1]];
+    }
+    if(tourLength < min_length)
+    { // update min_length and min_tour
+      min_length = tourLength;
+      for(j = 0;j < n;j++)
+      {
+        min_tour[j] = a[j];
+      }
+    }
+    else if(tourLength > max_length)
+    { // update max_length and max_tour
+      max_length = tourLength;
+      for(j = 0;j < n;j++)
+      {
+        max_tour[j] = a[j];
+      }
+    }
   }
 }
 
@@ -74,7 +92,7 @@ int main(int argc,char **argv)
 #if 0
   print_distances();
 #endif
-  for(n = 3;n <= n_cities;n++)
+  for(n = 3;n <= 13/*n_cities*/;n++)  // n_cities == 13 to reduce time execution
   {
     //
     // try tsp_v1
@@ -93,10 +111,22 @@ int main(int argc,char **argv)
       printf("tsp_v1() finished in %8.3fs (%ld tours generated)\n",dt1,n_tours);
       printf("  min %5d [",min_length);
       for(i = 0;i < n;i++)
-        printf("%2d%s",min_tour[i],(i == n - 1) ? "]\n" : ",");
+      {
+        printf("%2d%s",min_tour[i],(i == n - 1) ? "] - " : ",");
+      }
+      for(i = 0;i < n;i++)
+      {
+        printf("%s%s", cities[min_tour[i]].name,(i == n - 1) ? "\n" : ",");
+      } 
       printf("  max %5d [",max_length);
       for(i = 0;i < n;i++)
-        printf("%2d%s",max_tour[i],(i == n - 1) ? "]\n" : ",");
+      {
+        printf("%2d%s",max_tour[i],(i == n - 1) ? "] - " : ",");
+      }
+      for(i = 0;i < n;i++)
+      {
+        printf("%s%s", cities[max_tour[i]].name,(i == n - 1) ? "\n" : ",");
+      } 
       fflush(stdout);
       if(argc == 2 && strcmp(argv[1],"-f") == 0)
       {
