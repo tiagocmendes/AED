@@ -33,9 +33,13 @@ static long n_tours;
 
 void tsp_v1(int n,int m,int *a)
 {
+
+  
+  FILE *file;
   int i,j,t;
   int tourLength = 0;
-
+  file = fopen("test.csv", "a+");// a maneira como eu estruturei o codigo tive que fazer 'a+' em vez de 'w' para ir adicionando em cada linha a nova tour
+ 
   if(m < n - 1)
     for(i = m;i < n;i++)
     {
@@ -46,6 +50,7 @@ void tsp_v1(int n,int m,int *a)
       t = a[m];
       a[m] = a[i];
       a[i] = t;
+      
     }
   else
   { // visit permutation
@@ -53,6 +58,10 @@ void tsp_v1(int n,int m,int *a)
     for(j = 0;j < n-1;j++)
     { // compute tourLength
       tourLength += cities[a[j]].distance[a[j+1]];
+      
+    }
+    if(n==11){
+      fprintf(file,"%5d \n",tourLength);//se quiseres correr mais que n=11 eliminar codigo de escrever no file
     }
     if(tourLength < min_length)
     { // update min_length and min_tour
@@ -71,6 +80,7 @@ void tsp_v1(int n,int m,int *a)
       }
     }
   }
+  fclose(file);
 }
 
 
@@ -92,7 +102,7 @@ int main(int argc,char **argv)
 #if 0
   print_distances();
 #endif
-  for(n = 3;n <= 13/*n_cities*/;n++)  // n_cities == 13 to reduce time execution
+  for(n = 3;n <= 11/*n_cities*/;n++)  // n_cities == 13 to reduce time execution
   {
     //
     // try tsp_v1
