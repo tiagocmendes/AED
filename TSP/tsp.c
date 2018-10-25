@@ -113,9 +113,10 @@ void rand_perm(int n,int a[])
 
 int main(int argc,char **argv)
 {
-  int n_mec,special,n,i,j,a[max_n_cities];
+  int n_mec,special,n,i ,a[max_n_cities],a_simu[max_n_cities],repetitions=1000000,tourlengthsimu;//number of repetitions for the simulation
   char file_name[32];
   double dt1;
+  
 
   n_mec = 88886; // change later to n_mec = 88808 
   special = 0;
@@ -131,7 +132,7 @@ int main(int argc,char **argv)
 #if 0
   print_distances();
 #endif
-  for(n = 3;n <= 14/*n_cities*/;n++)  // n_cities == 13 to reduce time execution
+  for(n = 3;n <= 7/*n_cities*/;n++)  // n_cities == 13 to reduce time execution
   {
     //
     // try tsp_v1
@@ -175,6 +176,44 @@ int main(int argc,char **argv)
         printf("%s%s", cities[max_tour[i]].name,(i == n - 1) ? "\n\n" : ",");
       }
 
+
+      min_length = 1000000000; //renitialize the variables so we can compute min_length and max_length for the simulation
+      max_length = 0;
+      for(int k=0;k<=repetitions;k++){
+        rand_perm(n,a_simu);// permutation with n-1 numbers
+        tourlengthsimu = computeTourLength(n,a_simu);
+        updateLengths(n,tourlengthsimu,a_simu);  // update min_length, min_tour, max_length and max_tour
+       
+      }
+      //simulation print
+      // print min_tour by index
+      printf("Simulação com %8d repetições \n",repetitions);
+      printf("  min %5d [",min_length);
+      for(i = 0;i < n;i++)
+      {
+        printf("%2d%s",min_tour[i],(i == n - 1) ? "] - " : ",");
+      }
+
+      // print min_tour by city name
+      for(i = 0;i < n;i++)
+      {
+        printf("%s%s", cities[min_tour[i]].name,(i == n - 1) ? "\n" : ",");
+      }
+
+      // print max_tour by index
+      printf("  max %5d [",max_length);
+      for(i = 0;i < n;i++)
+      {
+        printf("%2d%s",max_tour[i],(i == n - 1) ? "] - " : ",");
+      }
+
+      // print max_tour by city name
+      for(i = 0;i < n;i++)
+      {
+        printf("%s%s", cities[max_tour[i]].name,(i == n - 1) ? "\n\n" : ",");
+      }
+
+     
       // save the computed data into a file
       fprintf(file,"%d;%8.3f;%d;[",n,dt1,min_length);
       for(i = 0; i < n;i++)
