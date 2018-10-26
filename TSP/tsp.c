@@ -130,7 +130,7 @@ int main(int argc,char **argv)
   FILE *file;
 
   n_mec = 88886; // change later to n_mec = 88808 
-  special = 1;   // if you want asymmetric distances, change this to special = 1;
+  special = 0;   // if you want asymmetric distances, change this to special = 1;
   random = 0;    // if you want random permutations, change this to random = 1;
   init_cities_data(n_mec,special);
   printf("data for init_cities_data(%d,%d)\n",n_mec,special);
