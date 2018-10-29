@@ -1,0 +1,5 @@
+
+
+Implementar a fila - pegar na lista
+
+Wikipedia turing complete
