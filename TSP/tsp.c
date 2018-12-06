@@ -143,7 +143,7 @@ void rand_perm(int n,int a[])
 
 int main(int argc,char **argv)
 {
-  int n_mec,special,random,n,i,a[max_n_cities];
+  int n_mec,special,random,print,n,i,a[max_n_cities];
   char file_name[64];
   double dt1;
   FILE *file, *file2;
@@ -152,14 +152,17 @@ int main(int argc,char **argv)
   special = 0;   // if you want asymmetric distances, change this to special = 1
   random = 0;    // if you want random permutations, change this to random = 1
   histogram = 0; // if you want to make an histogram of the length of all tours, change this to histogram = 1
+  print = 0;
   init_cities_data(n_mec,special);
   printf("data for init_cities_data(%d,%d)\n",n_mec,special);
   fflush(stdout);
 
-  // open data file and initialize it
+  if(print != 0)
+  { // open data file and initialize it
   sprintf(file_name,"./Data/Special_%d/%d/%s.csv",special,n_mec,(random == 0) ? "tsp_data" : "tsp_random_data");
   file = fopen(file_name,"w");
   fprintf(file, "%s;%s;%s;%s;%s;%s\n","Number of cities (n)","Execution time (s)","minLength","minPath","maxLength","maxPath");
+  }
   
 #if 0
   print_distances();
@@ -225,7 +228,7 @@ int main(int argc,char **argv)
         }
 
         // save the computed data into a file
-        if(histogram == 0)
+        if(histogram == 0 && print != 0)
         {
           fprintf(file,"%d;%8.3f;%d;[",n,dt1,min_length);
           for(i = 0; i < n;i++)
@@ -239,7 +242,7 @@ int main(int argc,char **argv)
           }
         }
         
-        if(histogram == 1 && n == 12)
+        if(histogram == 1 && n == 12 && print != 0)
         {
           sprintf(file_name,"./Data/Special_%d/%d/%d_cities_tours_histogram.csv",special,n_mec,n);
           file2 = fopen(file_name,"w");
