@@ -69,8 +69,17 @@ static void insert_node(tree_node **link,tree_node *n)
 
 static int count_leaves(tree_node *link)
 {
-  // TO DO: delete the next line of code and place your code here
-  return -1;
+  int leafcount;
+  if(link==NULL){
+    return 0;
+  }
+  else if(link->left==NULL && link->right==NULL){
+    return 1;
+  }
+  else{
+    leafcount=count_leaves(link->right)+count_leaves(link->left);
+  }
+  return leafcount;
 }
 
 
@@ -83,9 +92,20 @@ static int count_leaves(tree_node *link)
 //
 
 static int tree_height(tree_node *link)
-{
-  // TO DO: delete the next line of code and place your code here
-  return -1;
+{ int height,height_left,height_right;
+  if (link==NULL){
+    return 0;
+  }
+  else{
+    height_left=tree_height(link->left);
+    height_right=tree_height(link->right);
+    if (height_left>=height_right)
+      height=height_left+1;
+    else
+      height=height_right+1;
+  }
+  
+  return height;
 }
 
 
@@ -123,15 +143,33 @@ tree_node *search_tree(tree_node *link,long data)
 //
 
 static int count_function_calls_on_hit(tree_node *link,int level)
-{
-  // TO DO: delete the next line of code and place your code here
-  return -1;
+{ 
+  if (link!=NULL){
+    tree_node *root=link;
+    for (int j=0;j<level;j++){
+        root=root->parent;
+    }
+    search_tree(root,link->data);
+    count_function_calls_on_hit(link->right,level++);
+    count_function_calls_on_hit(link->left,level++);
+
+  }
+  return search_counter;
 }
 
 static int count_function_calls_on_miss(tree_node *link,int level)
 {
-  // TO DO: delete the next line of code and place your code here
-  return -1;
+  if (link!=NULL){
+    tree_node *root=link;
+    for (int j=0;j<level;j++){
+        root=root->parent;
+    }
+    search_tree(root,link->data);
+    count_function_calls_on_hit(link->right,level++);
+    count_function_calls_on_hit(link->left,level++);
+
+  }
+  return search_counter;
 }
 
 
