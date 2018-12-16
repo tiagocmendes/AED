@@ -15,11 +15,10 @@
 #include <string.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <limits.h>
 
 #include "cities.h"
 #include "elapsed_time.h"
-
-
 
 //
 // record best solutions
@@ -34,8 +33,8 @@ static long n_tours;
 //
 
 struct Map {
-   long long  key[39916800];
-   long long  value[39916800];
+   unsigned int key[2147483647];
+   unsigned int value[2147483647];
 } map;  
 
 int computeTourLength(int n, int *a)
@@ -48,8 +47,8 @@ int computeTourLength(int n, int *a)
   }
   tourLength += cities[a[n-1]].distance[a[0]];
 
-  // counter of different tours using a map structure for n = 12
-  if(histogram == 1 && n == 12)
+  // counter of different tours using a map structure for n = 12 or n = 15
+  if(histogram == 1 && (n == 12 || n == 15))
   {
     for(j = 0; j <= lc;j++)
       {
@@ -151,7 +150,7 @@ int main(int argc,char **argv)
   n_mec = 88886; // change later to n_mec = 88808 
   special = 0;   // if you want asymmetric distances, change this to special = 1
   random = 0;    // if you want random permutations, change this to random = 1
-  histogram = 0; // if you want to make an histogram of the length of all tours, change this to histogram = 1
+  histogram = 1; // if you want to make an histogram of the length of all tours, change this to histogram = 1
   print = 0;
   init_cities_data(n_mec,special);
   printf("data for init_cities_data(%d,%d)\n",n_mec,special);
@@ -159,15 +158,15 @@ int main(int argc,char **argv)
 
   if(print != 0)
   { // open data file and initialize it
-  sprintf(file_name,"./Data/Special_%d/%d/%s.csv",special,n_mec,(random == 0) ? "tsp_data" : "tsp_random_data");
-  file = fopen(file_name,"w");
-  fprintf(file, "%s;%s;%s;%s;%s;%s\n","Number of cities (n)","Execution time (s)","minLength","minPath","maxLength","maxPath");
+    sprintf(file_name,"./Data/Special_%d/%d/%s.csv",special,n_mec,(random == 0) ? "tsp_data" : "tsp_random_data");
+    file = fopen(file_name,"w");
+    fprintf(file, "%s;%s;%s;%s;%s;%s\n","Number of cities (n)","Execution time (s)","minLength","minPath","maxLength","maxPath");
   }
   
 #if 0
   print_distances();
 #endif
-    for(n = 3;n <= 15/*n_cities*/;n++)
+    for(n = 15;n <= 15/*n_cities*/;n++)
     {
       //
       // try tsp_v1
@@ -242,14 +241,14 @@ int main(int argc,char **argv)
           }
         }
         
-        if(histogram == 1 && n == 12 && print != 0)
+        if(histogram == 1 && (n == 12 || n == 15) && print == 0)
         {
           sprintf(file_name,"./Data/Special_%d/%d/%d_cities_tours_histogram.csv",special,n_mec,n);
           file2 = fopen(file_name,"w");
           fprintf(file2, "%s;%s\n","Tour","Occurrences");
           for(i = 0; i < lc; i++)
           {
-            fprintf(file2,"%lld;%lld\n",map.key[i],map.value[i]);
+            fprintf(file2,"%d;%d\n",map.key[i],map.value[i]);
           }
           fclose(file2);
         }
@@ -266,6 +265,6 @@ int main(int argc,char **argv)
         }      
       }
     }  
-  fclose(file);
+  //fclose(file);
   return 0;
 }
