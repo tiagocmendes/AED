@@ -28,6 +28,12 @@ static int min_length,max_length,lc,histogram;
 static int min_tour[max_n_cities + 1],max_tour[max_n_cities + 1];
 static long n_tours;
 
+// tsp_v2 extra variables
+static int visited_all;
+static int best_distances[262144][max_n_cities];
+static int current_city;
+static int control;
+static int best_position[262144][max_n_cities];
 //
 // first solution (brute force, distance computed at the end, compute best and worst tours)
 //
@@ -115,6 +121,59 @@ void tsp_v1(int n,int m,int *a)
   }
 }
 
+int tsp_v2(int mask, int position)
+{
+  if(mask == visited_all)
+  {
+    return cities[position].distance[0];
+  }
+  
+  if(best_distances[mask][position] != 0)
+  {
+    return best_distances[mask][position];
+  }
+
+  int min = 100000000, max = 0, city;
+  int best_city;
+
+  for(city = 0; city < current_city;city++)
+  {
+    if((mask&(1<<city)) == 0)
+    {
+      int d = cities[position].distance[city] + tsp_v2(mask|(1<<city),city);
+      
+      if(control == 0)
+      {
+        if(d < min)
+        {
+          min = d;
+          best_position[mask][position] = city;
+        }
+      } else 
+      {
+        if(d > max)
+        {
+          max = d;
+          best_position[mask][position] = city;
+        }
+      }
+    }
+  }
+
+  if(control == 0)
+  {
+    best_distances[mask][position] = min;
+  }
+  else
+  {
+    best_distances[mask][position] = max;
+  }
+    
+  return best_distances[mask][position];
+
+}
+
+
 void rand_perm(int n,int a[])
 {
   int i,j,k,tourLength;
@@ -142,20 +201,20 @@ void rand_perm(int n,int a[])
 
 int main(int argc,char **argv)
 {
-  int n_mec,special,random,print,n,i,a[max_n_cities];
+  int n_mec,special,random,print,n,i,a[max_n_cities],tsp_v;
   char file_name[64];
   double dt1;
   FILE *file, *file2;
 
-  n_mec = 88886; // change later to n_mec = 88808 
+  n_mec = 0; // change later to n_mec = 88808 
   special = 0;   // if you want asymmetric distances, change this to special = 1
   random = 0;    // if you want random permutations, change this to random = 1
-  histogram = 1; // if you want to make an histogram of the length of all tours, change this to histogram = 1
-  print = 0;
+  histogram = 0; // if you want to make an histogram of the length of all tours, change this to histogram = 1
+  print = 0;     // if you want to save the data to a .csv file, change this to 1
+  tsp_v = 2;     // if you want to solve TSP problem using Dynamic Programming, change this to 2
   init_cities_data(n_mec,special);
   printf("data for init_cities_data(%d,%d)\n",n_mec,special);
   fflush(stdout);
-
   if(print != 0)
   { // open data file and initialize it
     sprintf(file_name,"./Data/Special_%d/%d/%s.csv",special,n_mec,(random == 0) ? "tsp_data" : "tsp_random_data");
@@ -166,13 +225,13 @@ int main(int argc,char **argv)
 #if 0
   print_distances();
 #endif
-    for(n = 15;n <= 15/*n_cities*/;n++)
+    for(n = 3;n <= 18/*n_cities*/;n++)
     {
       //
       // try tsp_v1
       //
       dt1 = -1.0;
-      if(n <= 16)
+      if(n <= 18)
       {
         (void)elapsed_time();
         for(i = 0;i < n;i++)
@@ -187,7 +246,32 @@ int main(int argc,char **argv)
         // choose permutations type
         if(random == 0)
         {
-          tsp_v1(n,1,a); // no need to change the starting city, as we are making a tour
+          if(tsp_v == 1)
+          {
+            tsp_v1(n,1,a); // no need to change the starting city, as we are making a tour
+          } 
+          else
+          {
+            current_city = n;
+            for(int c = 0;c < 2;c++)
+            {
+              visited_all = (1<<current_city) - 1;
+              for(int mask = 0;mask < 262144;mask++)
+                for(int position = 0;position < max_n_cities;position++)
+                  best_distances[mask][position] = 0;
+              if(control == 0)
+              {
+                min_length = tsp_v2(1,0);
+                control = 1;
+              }
+              else
+              {
+                max_length = tsp_v2(1,0);
+                control = 0;
+              }
+            }
+          }
+          
         }
         else 
         { // random permutations
