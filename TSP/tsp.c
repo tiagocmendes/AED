@@ -33,7 +33,8 @@ static int visited_all;
 static int best_distances[262144][max_n_cities];
 static int current_city;
 static int control;
-static int best_position[262144][max_n_cities];
+static int best_position[262144];
+
 //
 // first solution (brute force, distance computed at the end, compute best and worst tours)
 //
@@ -147,19 +148,20 @@ int tsp_v2(int mask, int position)
         if(d < min)
         {
           min = d;
-          best_position[mask][position] = city;
+          best_city = city;
         }
       } else 
       {
         if(d > max)
         {
           max = d;
-          best_position[mask][position] = city;
+          best_city = city;
         }
       }
     }
   }
-
+  
+  best_position[mask] = best_city;
   if(control == 0)
   {
     best_distances[mask][position] = min;
@@ -206,7 +208,7 @@ int main(int argc,char **argv)
   double dt1;
   FILE *file, *file2;
 
-  n_mec = 0; // change later to n_mec = 88808 
+  n_mec = 0;     // change later to n_mec = 88808 
   special = 0;   // if you want asymmetric distances, change this to special = 1
   random = 0;    // if you want random permutations, change this to random = 1
   histogram = 0; // if you want to make an histogram of the length of all tours, change this to histogram = 1
@@ -262,11 +264,27 @@ int main(int argc,char **argv)
               if(control == 0)
               {
                 min_length = tsp_v2(1,0);
+                int pos = 1;
+                for(int x1 = 1; x1 != visited_all;)
+                {
+                  int x2 = best_position[x1];
+                  min_tour[pos] = x2;
+                  x1 = x1|(1<<x2);
+                  pos++;
+                }
                 control = 1;
               }
               else
               {
                 max_length = tsp_v2(1,0);
+                int pos = 1;
+                for(int x1 = 1; x1 != visited_all;)
+                {
+                  int x2 = best_position[x1];
+                  max_tour[pos] = x2;
+                  x1 = x1|(1<<x2);
+                  pos++;
+                }
                 control = 0;
               }
             }

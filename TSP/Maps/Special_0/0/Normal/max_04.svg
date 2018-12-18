@@ -1895,7 +1895,7 @@
     <path
        style="fill:none;fill-rule:evenodd;stroke:#c00000;stroke-width:5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.5"
        id="ClosedPath"
-       d="M 491.9807,1591.8580 L 418.4659,2011.3139 813.8801,1275.8997 811.2355,2823.4144 Z"
+       d="M 491.9807,1591.8580 L 811.2355,2823.4144 813.8801,1275.8997 418.4659,2011.3139 Z"
        inkscape:connector-curvature="0" />
   </g>
 </svg>
