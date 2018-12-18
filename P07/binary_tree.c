@@ -143,33 +143,34 @@ tree_node *search_tree(tree_node *link,long data)
 //
 
 static int count_function_calls_on_hit(tree_node *link,int level)
-{ 
-  if (link!=NULL){
-    tree_node *root=link;
-    for (int j=0;j<level;j++){
-        root=root->parent;
-    }
-    search_tree(root,link->data);
-    count_function_calls_on_hit(link->right,level++);
-    count_function_calls_on_hit(link->left,level++);
-
+{ int count;
+  if (link==NULL){
+    
+    return 0;
   }
-  return search_counter;
+  count = level+1;
+  if(link->left!=NULL)
+    count+=count_function_calls_on_hit(link->left,level+1);
+  if(link->right!=NULL)
+    count+=count_function_calls_on_hit(link->right,level+1);
+
+  return count;
+
+ 
 }
 
 static int count_function_calls_on_miss(tree_node *link,int level)
-{
-  if (link!=NULL){
-    tree_node *root=link;
-    for (int j=0;j<level;j++){
-        root=root->parent;
-    }
-    search_tree(root,link->data);
-    count_function_calls_on_hit(link->right,level++);
-    count_function_calls_on_hit(link->left,level++);
-
+{ int count=0;// tenho que inicializar
+  if (link==NULL){
+    count=level+1;
+    return count;
   }
-  return search_counter;
+  
+  count+=count_function_calls_on_miss(link->right,level+1);
+  count+=count_function_calls_on_miss(link->left,level+1);
+
+  
+  return count;
 }
 
 
@@ -207,6 +208,9 @@ int main(int argc,char **argv)
 {
   int details = (argc == 3 && argv[1][0] == '-' && argv[1][1] == 'a' && atoi(argv[2]) > 0) ? 1 : 0;
   int n_experiments = 1000; // TO DO: use more (1000000 should take 2 to 3 hours)
+  FILE *file;                                            // location of minima and maxima
+  file = fopen("Data.csv","w");
+   fprintf(file,"%s;%s;%s;%s;%s\n","n","maximum tree height (mean)","number of leaves (mean)","calls om hit (mean)","calls on miss (mean)");
 
   srandom(1u); // ensure reproducible results
   printf("                                  data for %d random trees\n",n_experiments);
@@ -223,9 +227,12 @@ int main(int argc,char **argv)
     int h_leaves[n + 1];                                // for an histogram of the number of leaves of the random trees
     double mean,std;                                    // for mean and standard deviation computations
     double x,hit[2],miss[2];                            // for the average number of hits and misses
-    int m,M;                                            // location of minima and maxima
-
+    int m,M;
+    
+    
     printf("%6d",n);
+   
+    fprintf(file,"%6d;",n);
     //
     // the example in the slides
     //
@@ -262,6 +269,8 @@ int main(int argc,char **argv)
           return 1; // impossible if the program is correct
       if(count_function_calls_on_miss(root,0) != search_counter)
       {
+        printf("%d -- %d",count_function_calls_on_hit(root,0),search_counter);
+
         fprintf(stderr,"count_function_calls_of_miss() returned a wrong value\n");
         exit(1);
       }
@@ -308,6 +317,7 @@ int main(int argc,char **argv)
     std /= (double)n_experiments;
     std = sqrt(std - mean * mean);
     printf("  %3d %3d %7.4f %6.4f",m,M,mean,std);
+    fprintf(file,"%7.4f;",mean);
     mean = std = 0.0;
     m = n + 1;
     M = -1;
@@ -323,14 +333,18 @@ int main(int argc,char **argv)
     std /= (double)n_experiments;
     std = sqrt(std - mean * mean);
     printf("  %5d %5d %10.4f %8.4f",m,M,mean,std);
+    fprintf(file,"%10.4f;",mean);
+
     mean = hit[0] / (double)n_experiments;
     std = hit[1] / (double)n_experiments;
     std = sqrt(std - mean * mean);
     printf("  %7.4f %6.4f",mean,std);
+    fprintf(file,"%6.4f;",mean);
     mean = miss[0] / (double)n_experiments;
     std = miss[1] / (double)n_experiments;
     std = sqrt(std - mean * mean);
     printf("  %7.4f %6.4f",mean,std);
+    fprintf(file,"%6.4f\n",mean);
     printf("\n");
     //
     // output the tree height data
