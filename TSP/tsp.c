@@ -30,10 +30,10 @@ static long n_tours;
 
 // tsp_v2 extra variables
 static int visited_all;
-static int best_distances[262144][max_n_cities];
+static int best_distances[(1<<max_n_cities)][max_n_cities];
 static int current_city;
 static int control;
-static int best_position[262144];
+static int best_position[(1<<max_n_cities)][max_n_cities];
 
 //
 // first solution (brute force, distance computed at the end, compute best and worst tours)
@@ -135,7 +135,7 @@ int tsp_v2(int mask, int position)
   }
 
   int min = 100000000, max = 0, city;
-  int best_city;
+  int best_city = 0;
 
   for(city = 0; city < current_city;city++)
   {
@@ -161,7 +161,7 @@ int tsp_v2(int mask, int position)
     }
   }
   
-  best_position[mask] = best_city;
+  best_position[mask][position] = best_city;
   if(control == 0)
   {
     best_distances[mask][position] = min;
@@ -258,33 +258,49 @@ int main(int argc,char **argv)
             for(int c = 0;c < 2;c++)
             {
               visited_all = (1<<current_city) - 1;
-              for(int mask = 0;mask < 262144;mask++)
+              for(int mask = 0;mask < (1<<max_n_cities);mask++)
                 for(int position = 0;position < max_n_cities;position++)
+                {
                   best_distances[mask][position] = 0;
+                  best_position[mask][position] = 0;
+                }
+                  
               if(control == 0)
               {
                 min_length = tsp_v2(1,0);
-                int pos = 1;
+                int pos = 0; int indice = 0;
                 for(int x1 = 1; x1 != visited_all;)
                 {
-                  int x2 = best_position[x1];
-                  min_tour[pos] = x2;
+                  int x2 = best_position[x1][pos];
+                  min_tour[indice] = x2;
                   x1 = x1|(1<<x2);
-                  pos++;
+                  pos=x2;
+                  indice++;
                 }
+                for(int ola = indice; ola > 0; ola--)
+                {
+                  min_tour[ola] = min_tour[ola-1];
+                }
+                min_tour[0] = 0;
                 control = 1;
               }
               else
               {
                 max_length = tsp_v2(1,0);
-                int pos = 1;
+                int pos = 0; int indice = 0;
                 for(int x1 = 1; x1 != visited_all;)
                 {
-                  int x2 = best_position[x1];
-                  max_tour[pos] = x2;
+                  int x2 = best_position[x1][pos];
+                  max_tour[indice] = x2;
                   x1 = x1|(1<<x2);
-                  pos++;
+                  pos=x2;
+                  indice++;
                 }
+                for(int ola = indice; ola > 0; ola--)
+                {
+                  max_tour[ola] = max_tour[ola-1];
+                }
+                max_tour[0] = 0;
                 control = 0;
               }
             }
