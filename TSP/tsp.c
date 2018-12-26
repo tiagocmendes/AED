@@ -192,7 +192,7 @@ int main(int argc,char **argv)
   FILE *file, *file2;
 
   n_mec = 88808; // change later to n_mec = 88808 
-  special = 0;   // if you want asymmetric distances, change this to special = 1
+  special = 1;   // if you want asymmetric distances, change this to special = 1
   random = 0;    // if you want random permutations, change this to random = 1
   histogram = 1; // if you want to make an histogram of the length of all tours, change this to histogram = 1
   print = 1;     // if you want to save the data to a .csv file, change this to 1
