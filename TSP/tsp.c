@@ -262,9 +262,9 @@ int main(int argc,char **argv)
                   pos=x2;
                   indice++;
                 }
-                for(int ola = indice; ola > 0; ola--)
+                for(int o = indice; o > 0; o--)
                 {
-                  min_tour[ola] = min_tour[ola-1];
+                  min_tour[o] = min_tour[o-1];
                 }
                 min_tour[0] = 0;
                 control = 1;
@@ -281,9 +281,9 @@ int main(int argc,char **argv)
                   pos=x2;
                   indice++;
                 }
-                for(int ola = indice; ola > 0; ola--)
+                for(int o = indice; o > 0; o--)
                 {
-                  max_tour[ola] = max_tour[ola-1];
+                  max_tour[o] = max_tour[o-1];
                 }
                 max_tour[0] = 0;
                 control = 0;
