@@ -21,12 +21,13 @@
 #include "elapsed_time.h"
 
 //
-// record best solutions
+// record best solutions for tsp_v1
 //
 
 static int min_length,max_length,lc,histogram;
 static int min_tour[max_n_cities + 1],max_tour[max_n_cities + 1];
 static long n_tours;
+static int hist[10000];
 
 // tsp_v2 extra variables
 static int visited_all;
@@ -39,14 +40,10 @@ static int best_position[(1<<max_n_cities)][max_n_cities];
 // first solution (brute force, distance computed at the end, compute best and worst tours)
 //
 
-struct Map {
-   unsigned int key[2147483647];
-   unsigned int value[2147483647];
-} map;  
 
 int computeTourLength(int n, int *a)
-{
-  int i, j, tourLength = 0;
+{ // function to compute tour length in the tsp_v1
+  int i, tourLength = 0;
 
   for(i = 0;i < n-1;i++)
   {
@@ -54,30 +51,16 @@ int computeTourLength(int n, int *a)
   }
   tourLength += cities[a[n-1]].distance[a[0]];
 
-  // counter of different tours using a map structure for n = 12 or n = 15
+  // histogram of the length of all tours for 12 and 15 cities
   if(histogram == 1 && (n == 12 || n == 15))
   {
-    for(j = 0; j <= lc;j++)
-      {
-        if(j == lc)
-        { // if tourLength is not in the map, set it's value equal to 1
-          map.key[j] = tourLength;
-          map.value[j] = 1;
-          lc++;
-          break;
-        }
-        if(map.key[j] == tourLength)
-        { // if tourLength is in the map, increment it's value by 1
-          map.value[j]++;
-          break;
-        }
-      }
+    hist[tourLength]++;
   }
   return tourLength;
 }
 
 void updateLengths(int n, int tourLength, int *a)
-{
+{ // function to update distances and tours (best and worst) in the tsp_v1
   int i;
 
   if(tourLength < min_length)
@@ -117,7 +100,7 @@ void tsp_v1(int n,int m,int *a)
   else
   { // visit permutation
     n_tours++;
-    tourLength = computeTourLength(n,a);
+    tourLength = computeTourLength(n,a);  // compute tour length
     updateLengths(n,tourLength,a);  // update min_length, min_tour, max_length and max_tour
   }
 }
@@ -177,7 +160,7 @@ int tsp_v2(int mask, int position)
 
 
 void rand_perm(int n,int a[])
-{
+{ // function to generate random permutations in the tsp_v1
   int i,j,k,tourLength;
 
   for(i = 0;i < n;i++)
@@ -204,36 +187,38 @@ void rand_perm(int n,int a[])
 int main(int argc,char **argv)
 {
   int n_mec,special,random,print,n,i,a[max_n_cities],tsp_v;
-  char file_name[64];
+  char file_name[64], file_name2[64];
   double dt1;
   FILE *file, *file2;
 
-  n_mec = 0;     // change later to n_mec = 88808 
-  special = 0;   // if you want asymmetric distances, change this to special = 1
+  n_mec = 88808; // change later to n_mec = 88808 
+  special = 1;   // if you want asymmetric distances, change this to special = 1
   random = 0;    // if you want random permutations, change this to random = 1
-  histogram = 0; // if you want to make an histogram of the length of all tours, change this to histogram = 1
-  print = 0;     // if you want to save the data to a .csv file, change this to 1
-  tsp_v = 2;     // if you want to solve TSP problem using Dynamic Programming, change this to 2
+  histogram = 1; // if you want to make an histogram of the length of all tours, change this to histogram = 1
+  print = 1;     // if you want to save the data to a .csv file, change this to 1
+  tsp_v = 1;     // if you want to solve TSP problem using Dynamic Programming, change this to 2
+
   init_cities_data(n_mec,special);
   printf("data for init_cities_data(%d,%d)\n",n_mec,special);
   fflush(stdout);
+
   if(print != 0)
-  { // open data file and initialize it
+  { // open file and initialize it
     sprintf(file_name,"./Data/Special_%d/%d/%s.csv",special,n_mec,(random == 0) ? "tsp_data" : "tsp_random_data");
     file = fopen(file_name,"w");
     fprintf(file, "%s;%s;%s;%s;%s;%s\n","Number of cities (n)","Execution time (s)","minLength","minPath","maxLength","maxPath");
   }
   
-#if 0
+#if 1
   print_distances();
 #endif
-    for(n = 3;n <= 18/*n_cities*/;n++)
+    for(n = 3;n <= max_n_cities;n++)
     {
       //
       // try tsp_v1
       //
       dt1 = -1.0;
-      if(n <= 18)
+      if(n <= 15)
       {
         (void)elapsed_time();
         for(i = 0;i < n;i++)
@@ -253,7 +238,7 @@ int main(int argc,char **argv)
             tsp_v1(n,1,a); // no need to change the starting city, as we are making a tour
           } 
           else
-          {
+          { // tsp_v2 - dynamic programming approach
             current_city = n;
             for(int c = 0;c < 2;c++)
             {
@@ -264,7 +249,7 @@ int main(int argc,char **argv)
                   best_distances[mask][position] = 0;
                   best_position[mask][position] = 0;
                 }
-                  
+              // update min_tour or max_tour
               if(control == 0)
               {
                 min_length = tsp_v2(1,0);
@@ -309,7 +294,7 @@ int main(int argc,char **argv)
         }
         else 
         { // random permutations
-          for(i = 0;i < 1000000;i++)
+          for(i = 0;i < 20000000;i++)
           {
             rand_perm(n,a);
           }
@@ -322,30 +307,18 @@ int main(int argc,char **argv)
         printf("  min %5d [",min_length);
         for(i = 0;i < n;i++)
         {
-          printf("%2d%s",min_tour[i],(i == n - 1) ? "] - " : ",");
-        }
-
-        // print min_tour by city name
-        for(i = 0;i < n;i++)
-        {
-          printf("%s%s", cities[min_tour[i]].name,(i == n - 1) ? "\n" : ",");
+          printf("%2d%s",min_tour[i],(i == n - 1) ? "]\n" : ",");
         }
 
         // print max_tour by index
         printf("  max %5d [",max_length);
         for(i = 0;i < n;i++)
         {
-          printf("%2d%s",max_tour[i],(i == n - 1) ? "] - " : ",");
-        }
-
-        // print max_tour by city name
-        for(i = 0;i < n;i++)
-        {
-          printf("%s%s", cities[max_tour[i]].name,(i == n - 1) ? "\n\n" : ",");
+          printf("%2d%s",max_tour[i],(i == n - 1) ? "]\n\n" : ",");
         }
 
         // save the computed data into a file
-        if(histogram == 0 && print != 0)
+        if(print != 0)
         {
           fprintf(file,"%d;%8.3f;%d;[",n,dt1,min_length);
           for(i = 0; i < n;i++)
@@ -359,14 +332,14 @@ int main(int argc,char **argv)
           }
         }
         
-        if(histogram == 1 && (n == 12 || n == 15) && print == 0)
+        if(histogram == 1 && (n == 12 || n == 15))
         {
-          sprintf(file_name,"./Data/Special_%d/%d/%d_cities_tours_histogram.csv",special,n_mec,n);
-          file2 = fopen(file_name,"w");
-          fprintf(file2, "%s;%s\n","Tour","Occurrences");
-          for(i = 0; i < lc; i++)
+          sprintf(file_name2,"./Data/Special_%d/%d/%d_cities_tours_histogram.csv",special,n_mec,n);
+          file2 = fopen(file_name2,"w");
+          //fprintf(file2, "%s;%s\n","Tour","Occurrences");
+          for(i = 0; i < 10000; i++)
           {
-            fprintf(file2,"%d;%d\n",map.key[i],map.value[i]);
+            fprintf(file2,"%d,%d\n",i,hist[i]);
           }
           fclose(file2);
         }
@@ -382,7 +355,9 @@ int main(int argc,char **argv)
           make_map(file_name,max_tour);
         }      
       }
-    }  
-  //fclose(file);
+    }
+  if(print == 1) {
+    fclose(file);
+  }
   return 0;
 }

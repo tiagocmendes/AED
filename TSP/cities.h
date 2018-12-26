@@ -332,6 +332,7 @@ static void print_distances(void)
         printf(" %3d",cities[i].distance[j]);
     printf("\n");
   }
+  printf("\n");
 }
 
 static void make_map(char *file_name,int *cities_idx)
