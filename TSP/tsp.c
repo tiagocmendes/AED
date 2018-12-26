@@ -191,12 +191,12 @@ int main(int argc,char **argv)
   double dt1;
   FILE *file, *file2;
 
-  n_mec = 88808; // change later to n_mec = 88808 
+  n_mec = 88886; // change later to n_mec = 88808 
   special = 0;   // if you want asymmetric distances, change this to special = 1
   random = 0;    // if you want random permutations, change this to random = 1
-  histogram = 1; // if you want to make an histogram of the length of all tours, change this to histogram = 1
-  print = 1;     // if you want to save the data to a .csv file, change this to 1
-  tsp_v = 1;     // if you want to solve TSP problem using Dynamic Programming, change this to 2
+  histogram = 0; // if you want to make an histogram of the length of all tours, change this to histogram = 1
+  print = 0;     // if you want to save the data to a .csv file, change this to 1
+  tsp_v = 2;     // if you want to solve TSP problem using Dynamic Programming, change this to 2
 
   init_cities_data(n_mec,special);
   printf("data for init_cities_data(%d,%d)\n",n_mec,special);
@@ -218,7 +218,7 @@ int main(int argc,char **argv)
       // try tsp_v1
       //
       dt1 = -1.0;
-      if(n <= 15)
+      if(n <= 18)
       {
         (void)elapsed_time();
         for(i = 0;i < n;i++)
