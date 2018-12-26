@@ -210,7 +210,7 @@ int main(int argc,char **argv)
   int n_experiments = 1000; // TO DO: use more (1000000 should take 2 to 3 hours)
   FILE *file;                                            // location of minima and maxima
   file = fopen("Data.csv","w");
-   fprintf(file,"%s;%s;%s;%s;%s\n","n","maximum tree height (mean)","number of leaves (mean)","calls om hit (mean)","calls on miss (mean)");
+   fprintf(file,"%s,%s,%s,%s,%s,%s,%s,%s,%s\n","n","maximum tree height (min)","maximum tree height (max)","maximum tree height (mean)","number of leaves (min)","number of leaves (max)","number of leaves (mean)","calls om hit (mean)","calls on miss (mean)");
 
   srandom(1u); // ensure reproducible results
   printf("                                  data for %d random trees\n",n_experiments);
@@ -232,7 +232,7 @@ int main(int argc,char **argv)
     
     printf("%6d",n);
    
-    fprintf(file,"%6d;",n);
+    fprintf(file,"%6d,",n);
     //
     // the example in the slides
     //
@@ -317,7 +317,7 @@ int main(int argc,char **argv)
     std /= (double)n_experiments;
     std = sqrt(std - mean * mean);
     printf("  %3d %3d %7.4f %6.4f",m,M,mean,std);
-    fprintf(file,"%7.4f;",mean);
+    fprintf(file,"%3d,%3d,%7.4f,",m,M,mean);
     mean = std = 0.0;
     m = n + 1;
     M = -1;
@@ -333,13 +333,13 @@ int main(int argc,char **argv)
     std /= (double)n_experiments;
     std = sqrt(std - mean * mean);
     printf("  %5d %5d %10.4f %8.4f",m,M,mean,std);
-    fprintf(file,"%10.4f;",mean);
+    fprintf(file,"%5d,%5d,%10.4f,",m,M,mean);
 
     mean = hit[0] / (double)n_experiments;
     std = hit[1] / (double)n_experiments;
     std = sqrt(std - mean * mean);
     printf("  %7.4f %6.4f",mean,std);
-    fprintf(file,"%6.4f;",mean);
+    fprintf(file,"%6.4f,",mean);
     mean = miss[0] / (double)n_experiments;
     std = miss[1] / (double)n_experiments;
     std = sqrt(std - mean * mean);
