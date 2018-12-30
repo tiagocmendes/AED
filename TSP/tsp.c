@@ -24,7 +24,7 @@
 // record best solutions for tsp_v1
 //
 
-static int min_length,max_length,lc,histogram;
+static int min_length,max_length,histogram;
 static int min_tour[max_n_cities + 1],max_tour[max_n_cities + 1];
 static long n_tours;
 static int hist[10000];
@@ -105,6 +105,28 @@ void tsp_v1(int n,int m,int *a)
   }
 }
 
+void rand_perm(int n,int a[])
+{ // function to generate random permutations in the tsp_v1
+  int i,j,k,tourLength;
+
+  for(i = 0;i < n;i++)
+  {
+    a[i] = i;
+  }
+  for(i = n - 1;i > 0;i--)
+  {
+    j = (int)floor((double)(i + 1) * (double)rand() / (1.0 + (double)RAND_MAX)); // range 0..i
+    assert(j >= 0 && j <= i);
+    k = a[i];
+    a[i] = a[j];
+    a[j] = k;
+  }
+  n_tours++;
+  tourLength = computeTourLength(n,a);
+  updateLengths(n,tourLength,a);  // update min_length, min_tour, max_length and max_tour
+}
+
+
 int tsp_v2(int mask, int position)
 {
   if(mask == visited_all)
@@ -158,28 +180,6 @@ int tsp_v2(int mask, int position)
 
 }
 
-
-void rand_perm(int n,int a[])
-{ // function to generate random permutations in the tsp_v1
-  int i,j,k,tourLength;
-
-  for(i = 0;i < n;i++)
-  {
-    a[i] = i;
-  }
-  for(i = n - 1;i > 0;i--)
-  {
-    j = (int)floor((double)(i + 1) * (double)rand() / (1.0 + (double)RAND_MAX)); // range 0..i
-    assert(j >= 0 && j <= i);
-    k = a[i];
-    a[i] = a[j];
-    a[j] = k;
-  }
-  n_tours++;
-  tourLength = computeTourLength(n,a);
-  updateLengths(n,tourLength,a);  // update min_length, min_tour, max_length and max_tour
-}
-
 //
 // main program
 //
@@ -196,7 +196,7 @@ int main(int argc,char **argv)
   random = 0;    // if you want random permutations, change this to random = 1
   histogram = 0; // if you want to make an histogram of the length of all tours, change this to histogram = 1
   print = 0;     // if you want to save the data to a .csv file, change this to 1
-  tsp_v = 2;     // if you want to solve TSP problem using Dynamic Programming, change this to 2
+  tsp_v = 2;     // tsp_v = 1 (for Brute Force) or tsp_v = 2 (for Dynamic Programming)
 
   init_cities_data(n_mec,special);
   printf("data for init_cities_data(%d,%d)\n",n_mec,special);
@@ -227,8 +227,7 @@ int main(int argc,char **argv)
         max_length = 0;
         n_tours = 0l;
 
-        // different lengths counter
-        lc = 0;     
+        memset(hist, 0, sizeof(hist));
 
         // choose permutations type
         if(random == 0)
