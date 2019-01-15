@@ -191,7 +191,7 @@ int main(int argc,char **argv)
   double dt1;
   FILE *file, *file2;
 
-  n_mec = 88886; // change later to n_mec = 88808 
+  n_mec = 0; // change later to n_mec = 88808 
   special = 0;   // if you want asymmetric distances, change this to special = 1
   random = 0;    // if you want random permutations, change this to random = 1
   histogram = 0; // if you want to make an histogram of the length of all tours, change this to histogram = 1
